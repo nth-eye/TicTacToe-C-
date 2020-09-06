@@ -14,7 +14,7 @@ void Game::test()
 {
 	std::cout << str() << std::endl;
 
-	while (get_result() == EMPTY) {
+	while (result() == EMPTY) {
 		std::cout << "\nMake move: " << std::flush;
 		auto move = ask_input();
 		act(move);
@@ -22,7 +22,7 @@ void Game::test()
 	};
 }
 
-int Game::get_result() const
+int Game::result() const
 {
 	// Define player who just made move.
 	int player = turn ^ BOTH;
@@ -56,9 +56,9 @@ bool Game::legal(Action move) const
 	return state[move] == EMPTY;
 }
 
-float Game::get_reward() const
+float Game::reward() const
 {
-	switch (get_result()) {
+	switch (result()) {
 		case X:
 		case O: return 1.0f;
 		default: return 0.0f;
@@ -72,7 +72,7 @@ float Game::act(Action move)
 
 	history.push_back(state);
 
-	return get_reward();
+	return reward();
 }
 
 Action Game::ask_input() const
@@ -124,7 +124,7 @@ std::string Game::str() const
 	}
 	ss << "-------------\n";
 	ss << "\nturn:\t" << (turn == X ? 'X' : 'O') << "\nwinner:\t";
-	switch (get_result()) {
+	switch (result()) {
 		case EMPTY:	ss << '-'; break;
 		case X:		ss << 'X'; break;
 		case O:		ss << 'O'; break;

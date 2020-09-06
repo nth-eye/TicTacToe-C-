@@ -27,10 +27,10 @@ struct Game {
 	void test();
 
 	int to_play() const { return turn; }
-	int get_result() const;
-	bool terminal() const { return get_result() != EMPTY; }
+	int result() const;
+	bool terminal() const { return result() != EMPTY; }
 	bool legal(Action move) const;
-	float get_reward() const;
+	float reward() const;
 	float act(Action move);
 
 	Action ask_input() const;
