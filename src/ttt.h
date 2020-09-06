@@ -18,10 +18,8 @@ enum : int { EMPTY, X, O, BOTH };
 
 struct Game {
 
-	static constexpr int NO_MOVE = -1;
-
-	Game() { history.emplace_back(); };
-	Game(State state_) : state(std::move(state_)) { history.push_back(state); }
+	Game() = default;
+	Game(State state_) : state(std::move(state_)) {}
 	
 	void reset();
 	void test();
@@ -33,6 +31,7 @@ struct Game {
 	float reward() const;
 	float act(Action move);
 
+	State get_state() const { return state; }
 	Action ask_input() const;
 	ActionList legal_actions() const;
 
@@ -41,7 +40,6 @@ struct Game {
 private:
 	int turn = X;
 	State state = {};
-	std::vector<State> history;
 };
 
 }

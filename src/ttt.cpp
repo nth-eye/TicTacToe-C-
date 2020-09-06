@@ -4,8 +4,6 @@ namespace ttt {
 
 void Game::reset() 
 {
-	history.clear();
-	history.emplace_back();
 	turn = X;
 	state.fill(0);
 }
@@ -70,14 +68,12 @@ float Game::act(Action move)
 	state[move] = turn;
 	turn ^= BOTH;
 
-	history.push_back(state);
-
 	return reward();
 }
 
 Action Game::ask_input() const
 {
-	Action move = NO_MOVE;
+	Action move = -1;
 	while (true) {
 		std::cin >> move;
 		if (std::cin.fail()) {
