@@ -16,30 +16,28 @@ using State = std::array<int, 9>;
 
 enum : int { EMPTY, X, O, BOTH };
 
-struct Game {
+class Game {
+    int turn = X;
+    State state = {};
+public:
+    Game() = default;
+    Game(State state_) : state(std::move(state_)) {}
 
-	Game() = default;
-	Game(State state_) : state(std::move(state_)) {}
-	
-	void reset();
-	void test();
+    void reset();
+    void test();
 
-	int to_play() const { return turn; }
-	int result() const;
-	bool terminal() const { return result() != EMPTY; }
-	bool legal(Action move) const;
-	float reward() const;
-	float act(Action move);
+    int result() const;
+    int to_play() const     { return turn; }
+    bool terminal() const   { return result() != EMPTY; }
+    bool legal(Action move) const;
+    float reward() const;
+    float act(Action move);
 
-	State get_state() const { return state; }
-	Action ask_input() const;
-	ActionList legal_actions() const;
+    State get_state() const { return state; }
+    Action ask_input() const;
+    ActionList legal_actions() const;
 
-	std::string str() const;
-
-private:
-	int turn = X;
-	State state = {};
+    std::string str() const;
 };
 
 }
