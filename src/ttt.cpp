@@ -110,8 +110,8 @@ std::string Game::str() const
         for (int col = 0; col < 3; ++col) {
             ss << '|';
             switch(state[row*3 + col]) {
-                case X: ss << " X "; break;
-                case O: ss << " O "; break;
+                case X:     ss << " X "; break;
+                case O:     ss << " O "; break;
                 case EMPTY: ss << "   "; break;
                 default: assert(false);
             }
@@ -121,10 +121,10 @@ std::string Game::str() const
     ss << "-------------\n";
     ss << "\nturn:\t" << (turn == X ? 'X' : 'O') << "\nwinner:\t";
     switch (result()) {
-        case EMPTY:	ss << '-'; break;
-        case X:		ss << 'X'; break;
-        case O:		ss << 'O'; break;
-        case BOTH:	ss << "draw"; break;
+        case EMPTY:	ss << '-';      break;
+        case X:		ss << 'X';      break;
+        case O:		ss << 'O';      break;
+        case BOTH:	ss << "draw";   break;
     }
     return ss.str();
 }
