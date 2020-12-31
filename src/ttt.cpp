@@ -1,11 +1,15 @@
+#include <limits>
+#include <sstream>
+#include <iostream>
+
 #include "ttt.h"
 
 namespace ttt {
 
 void Game::reset() 
 {
-    turn = X;
-    state.fill(0);
+    all = TURN;
+    current = 0;
 }
 
 void Game::test() 
@@ -17,33 +21,25 @@ void Game::test()
         auto move = ask_input();
         act(move);
         std::cout << str() << std::endl;
+        for (const auto it : legal_actions())
+            std::cout << int(it) << std::endl;
     };
 }
 
 int Game::result() const
 {
     // Define player who just made move.
-    int player = turn ^ BOTH;
+    auto player = all ^ current;
 
-    for (int cell = 0; cell < 9; cell += 3)
-        if ((state[cell] & state[cell+1] & state[cell+2]) == player)
-            return player;
+    for (const auto mask : WIN_MASKS) {
+        if ((mask & player) == mask) 
+            return player & TURN;
+    }
 
-    for (int cell = 0; cell < 3; ++cell)
-        if ((state[cell] & state[cell+3] & state[cell+6]) == player)
-            return player;
+    if ((all & BOARD) == BOARD)
+        return DRAW;
 
-    if ((state[0] & state[4] & state[8]) == player)
-        return player;
-
-    if ((state[2] & state[4] & state[6]) == player)
-        return player;
-
-    for (auto cell : state)
-        if (cell == EMPTY)
-            return EMPTY;
-
-    return BOTH;
+    return EMPTY;
 }
 
 bool Game::legal(Action move) const 
@@ -51,7 +47,7 @@ bool Game::legal(Action move) const
     if (move < 0 || move >= 9)
         return false;
 
-    return state[move] == EMPTY;
+    return ((1 << move) & all) == 0;
 }
 
 float Game::reward() const
@@ -65,8 +61,8 @@ float Game::reward() const
 
 float Game::act(Action move) 
 {
-    state[move] = turn;
-    turn ^= BOTH;
+    current ^= all;
+    all |= (1 << move);
 
     return reward();
 }
@@ -94,7 +90,7 @@ ActionList Game::legal_actions() const
     ActionList moves;
 
     for (int i = 0; i < 9; ++i)
-        if (state[i] == EMPTY)
+        if ((1 << i) & all == 0)
             moves.push_back(i);
 
     return moves;
@@ -105,26 +101,31 @@ std::string Game::str() const
     std::stringstream ss;
     ss << '\n';
 
+    char p1 = (current & TURN) == X ? 'X' : 'O';
+    char p2 = p1 == 'X' ? 'O' : 'X';
+
     for (int row = 0; row < 3; ++row) {
         ss << "-------------\n";
         for (int col = 0; col < 3; ++col) {
-            ss << '|';
-            switch(state[row*3 + col]) {
-                case X:     ss << " X "; break;
-                case O:     ss << " O "; break;
-                case EMPTY: ss << "   "; break;
-                default: assert(false);
-            }
+            ss << "| ";
+            auto mask = (1ULL << (col + row*3));
+            if (current & mask)
+                ss << p1;
+            else if (all & mask)
+                ss << p2;
+            else 
+                ss << '-';
+            ss << ' ';
         }
         ss << "|\n";
     }
     ss << "-------------\n";
-    ss << "\nturn:\t" << (turn == X ? 'X' : 'O') << "\nwinner:\t";
+    ss << "\nturn:\t" << p1 << "\nwinner:\t";
     switch (result()) {
         case EMPTY:	ss << '-';      break;
         case X:		ss << 'X';      break;
         case O:		ss << 'O';      break;
-        case BOTH:	ss << "draw";   break;
+        case DRAW:	ss << "draw";   break;
     }
     return ss.str();
 }
