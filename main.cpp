@@ -2,7 +2,7 @@
 
 int main(int, char**) 
 {
-    auto game = ttt::Game();
+    TTT game;
 
-    game.test();
+    game.play();
 }

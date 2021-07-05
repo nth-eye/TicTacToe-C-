@@ -1,133 +1,133 @@
-#include <limits>
-#include <sstream>
-#include <iostream>
-
+#include <cstdio>
 #include "ttt.h"
 
-namespace ttt {
+constexpr Bitboard WIN_MASKS[8] = {
+    0b001001001, 0b010010010, 0b100100100, 0b000000111, 
+    0b000111000, 0b111000000, 0b100010001, 0b001010100
+};
 
-void Game::reset() 
+constexpr Bitboard bit(int i) { return 1ul << i; }
+
+void TTT::print() const
 {
-    all = TURN;
-    current = 0;
+    puts("\n");
+
+    char p1 = (current & TURN) == X ? 'X' : 'O';
+    char p2 = (current & TURN) == X ? 'O' : 'X';
+    char c;
+
+    for (int row = 0; row < 3; ++row) {
+
+        puts("-------------");
+
+        for (int col = 0; col < 3; ++col) {
+            
+            printf("| ");
+
+            Bitboard mask = 1ULL << (col + row * 3);
+
+            if (current & mask)
+                c = p1;
+            else if (all & mask)
+                c = p2;
+            else 
+                c = '-';
+
+            printf("%c ", c);
+        }
+        puts("|");
+    }
+    puts("-------------\n");
+    printf("turn:   %c \n", p1);
+    printf("result: ");
+    
+    switch (result()) {
+        case EMPTY:	c = '?';    break;
+        case X:		c = 'X';    break;
+        case O:		c = 'O';    break;
+        case DRAW:	c = '-';    break;
+    }
+    printf("%c \n\n", c);
 }
 
-void Game::test() 
+void TTT::play() 
 {
-    std::cout << str() << std::endl;
+    print();
 
     while (result() == EMPTY) {
-        std::cout << "\nMake move: " << std::flush;
-        auto move = ask_input();
-        act(move);
-        std::cout << str() << std::endl;
-        for (const auto it : legal_actions())
-            std::cout << int(it) << std::endl;
+
+        Move move = ask_input();
+
+        make_move(move);
+
+        print();
     };
 }
 
-int Game::result() const
+void TTT::reset() 
 {
-    // Define player who just made move.
-    auto player = all ^ current;
+    all     = TURN;
+    current = 0;
+}
 
-    for (const auto mask : WIN_MASKS) {
-        if ((mask & player) == mask) 
-            return player & TURN;
-    }
+void TTT::make_move(Move move) 
+{
+    current ^= all;
+    all     |= bit(move);
+}
 
+bool TTT::legal(Move move) const 
+{
+    if (move > 8)
+        return false;
+
+    return bit(move) & all == 0;
+}
+
+int TTT::result() const
+{
     if ((all & BOARD) == BOARD)
         return DRAW;
+
+    auto player = all ^ current;
+
+    for (auto mask : WIN_MASKS)
+        if ((mask & player) == mask) 
+            return player & TURN;
 
     return EMPTY;
 }
 
-bool Game::legal(Action move) const 
+Move TTT::ask_input() const
 {
-    if (move < 0 || move >= 9)
-        return false;
+    long long move = -1;
 
-    return ((1 << move) & all) == 0;
-}
-
-float Game::reward() const
-{
-    switch (result()) {
-        case X:
-        case O: return 1.0f;
-        default: return 0.0f;
-    }
-}
-
-float Game::act(Action move) 
-{
-    current ^= all;
-    all |= (1 << move);
-
-    return reward();
-}
-
-Action Game::ask_input() const
-{
-    Action move = -1;
     while (true) {
-        std::cin >> move;
-        if (std::cin.fail()) {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "\nIncorrect input\n" << std::endl;
+
+        printf("\nMake move: ");
+
+        int result = scanf("%lld", &move);
+
+        if (result == EOF || !result) {
+            puts("\nIncorrect input");
         } else if (!legal(move)) {
-            std::cout << "\nIllegal move\n" << std::endl;
+            puts("\nIllegal move");
         } else {
             break;
         }
+        while (fgetc(stdin) != '\n');
     };
     return move;
 }
 
-ActionList Game::legal_actions() const 
+MoveList TTT::moves() const 
 {
-    ActionList moves;
+    MoveList moves  = {};
+    size_t cnt      = 0;
 
     for (int i = 0; i < 9; ++i)
-        if ((1 << i) & all == 0)
-            moves.push_back(i);
+        if (bit(i) & all == 0)
+            moves[cnt++] = i;
 
     return moves;
-}
-
-std::string Game::str() const
-{
-    std::stringstream ss;
-    ss << '\n';
-
-    char p1 = (current & TURN) == X ? 'X' : 'O';
-    char p2 = p1 == 'X' ? 'O' : 'X';
-
-    for (int row = 0; row < 3; ++row) {
-        ss << "-------------\n";
-        for (int col = 0; col < 3; ++col) {
-            ss << "| ";
-            auto mask = (1ULL << (col + row*3));
-            if (current & mask)
-                ss << p1;
-            else if (all & mask)
-                ss << p2;
-            else 
-                ss << '-';
-            ss << ' ';
-        }
-        ss << "|\n";
-    }
-    ss << "-------------\n";
-    ss << "\nturn:\t" << p1 << "\nwinner:\t";
-    switch (result()) {
-        case EMPTY:	ss << '-';      break;
-        case X:		ss << 'X';      break;
-        case O:		ss << 'O';      break;
-        case DRAW:	ss << "draw";   break;
-    }
-    return ss.str();
-}
-
 }
