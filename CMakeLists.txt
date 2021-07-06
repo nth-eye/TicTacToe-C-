@@ -7,7 +7,7 @@ add_executable(ttt main.cpp src/ttt.cpp)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpedantic -Wno-parentheses -O3")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpedantic -O3")
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
