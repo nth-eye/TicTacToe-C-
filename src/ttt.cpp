@@ -24,7 +24,7 @@ void TTT::print() const
             
             printf("| ");
 
-            Bitboard mask = 1ULL << (col + row * 3);
+            Bitboard mask = bit(col + row * 3);
 
             if (current & mask)
                 c = p1;
@@ -55,11 +55,8 @@ void TTT::play()
     print();
 
     while (result() == EMPTY) {
-
         Move move = ask_input();
-
         make_move(move);
-
         print();
     };
 }
@@ -81,7 +78,7 @@ bool TTT::legal(Move move) const
     if (move > 8)
         return false;
 
-    return bit(move) & all == 0;
+    return !(bit(move) & all);
 }
 
 int TTT::result() const
@@ -122,12 +119,11 @@ Move TTT::ask_input() const
 
 MoveList TTT::moves() const 
 {
-    MoveList moves  = {};
-    size_t cnt      = 0;
+    MoveList moves;
 
     for (int i = 0; i < 9; ++i)
-        if (bit(i) & all == 0)
-            moves[cnt++] = i;
+        if (!(bit(i) & all))
+            moves.save(i);
 
     return moves;
 }

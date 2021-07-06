@@ -2,11 +2,21 @@
 #define TTT_H
 
 #include <cstdint>
-#include <array>
+#include <cstddef>
 
 using Bitboard  = uint_fast16_t;
 using Move      = uint_fast8_t;
-using MoveList  = std::array<Move, 9>;
+
+struct MoveList {
+    const Move* begin() const { return &list[0]; }
+    const Move* end() const   { return &list[len]; }
+    size_t size() const       { return len; }
+    void erase(size_t idx)    { list[idx] = list[--len]; }
+    void save(Move m)         { list[len++] = m; }
+private:
+    Move list[9];
+    size_t len = 0;
+};
 
 constexpr Bitboard BOARD    = 0b111111111;
 constexpr Bitboard TURN     = BOARD + 1;
