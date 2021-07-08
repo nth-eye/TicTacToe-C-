@@ -83,14 +83,14 @@ bool TTT::legal(Move move) const
 
 int TTT::result() const
 {
-    if ((all & BOARD) == BOARD)
-        return DRAW;
-
     auto player = all ^ current;
 
     for (auto mask : WIN_MASKS)
         if ((mask & player) == mask) 
             return player & TURN;
+
+    if ((all & BOARD) == BOARD)
+        return DRAW;
 
     return EMPTY;
 }
