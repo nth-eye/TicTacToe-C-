@@ -41,4 +41,4 @@ private:
     Bitboard current    = 0;
 };
 
-#endif // TTT_H
+#endif
