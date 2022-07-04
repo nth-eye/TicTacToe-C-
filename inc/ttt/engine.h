@@ -48,7 +48,7 @@ struct Engine {
         return move < 9 && !(bit(move) & all);
     }
 
-    constexpr auto moves() const
+    constexpr MoveList moves() const
     {
         return ~all & BOARD;
     }
