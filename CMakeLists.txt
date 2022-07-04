@@ -1,13 +1,10 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(ttt VERSION 0.1.0)
 
-include_directories(inc)
+add_library(libttt INTERFACE)
+target_include_directories(libttt INTERFACE inc)
+target_compile_features(libttt INTERFACE cxx_std_20)
 
-add_executable(ttt main.cpp src/ttt.cpp)
-
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpedantic -O3")
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include(CPack)
+add_executable(ttt main.cpp)
+target_compile_features(ttt PRIVATE cxx_std_20)
+target_link_libraries(ttt PRIVATE libttt)

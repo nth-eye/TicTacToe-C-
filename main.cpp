@@ -1,8 +1,6 @@
-#include "ttt.h"
+#include "ttt/interface.h"
 
 int main(int, char**) 
 {
-    TTT game;
-
-    game.play();
+    ttt::Interface{}.play();
 }
