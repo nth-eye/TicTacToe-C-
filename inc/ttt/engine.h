@@ -69,7 +69,7 @@ struct Engine {
                 return ~opp & TURN;
         return (all & BOARD) == BOARD ? DRAW : EMPTY;
     }
-private:
+protected:
     Bitboard all = TURN;
     Bitboard opp = 0;
 };
